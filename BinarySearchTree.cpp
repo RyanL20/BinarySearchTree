@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cstdlib> //not sure if needed yet (shown in tutorial)
+#include <cstring>
 
 struct node {
   int value;
@@ -12,67 +12,99 @@ struct node {
   }
 };
 
-
 void add(node* &root, int value);
 void print(node* &root);
 void printTree(node* &root, int space);
 node* search(node* &root, int value);
+int findLargest(node* &root);
+void remove(node* &root, int value);
 
 using namespace std;
 int input;
 
 int main() {
   node* root = NULL;
-  cout << "Type 16 numbers " << endl;
+  char action[80];
+  bool exit = 0;
+
+  cout << "Welcome to Binary Search Tree" << endl;
+  while (exit == 0) {
+    cout << "Executable Actions: FILE, ADD, SEARCH, PRINT, DELETE, QUIT" << endl;
+    cin >> action;
+
+    //FILE ADD
+    if (strcmp(action, "FILE") == 0) {
+
+    }
+
+    //ADD
+    else if (strcmp(action, "ADD") == 0) {
+      cout << "How many numbers do you want to enter? ";
+      int numAmount;
+      cin >> numAmount;
+      cout << "Enter numbers between 1-999." << endl;
+      for (int i = 1; i < numAmount+1; i++) {
+	cout << "[" << i << "] Enter number: ";
+	cin >> input;
+	add(root, input);
+      }
+    }
+
+    //SEARCH
+    else if (strcmp(action, "SEARCH") == 0) {
+      cout << "Search number: ";
+      cin >> input;
+      search(root, input);
+    }
+
+    //PRINT
+    else if (strcmp(action, "PRINT") == 0) {
+      cout << "Print Min to Max (MIN), Max to Min (MAX), or tree (TREE) ?" << endl;
+      cin >> action;
+      //Prints from Min to Max
+      if (strcmp(action, "MIN") == 0) {
+	print(root);
+	cout << endl;
+      }
+      //Prints from Max to Min
+      else if (strcmp(action, "MAX") == 0) {
+	
+      }
+      //Prints Tree
+      else if (strcmp(action, "TREE") == 0) {
+	printTree(root, 0);
+      }
+    }
+
+    //DELETE
+    else if (strcmp(action, "DELETE") == 0) {
+      cout << "Delete number: ";
+      cin >> input;
+      search(root, input); //tells user if the wanted delete number is in tree
+      remove(root, input);
+    }
+
+    //QUIT
+    else if (strcmp(action, "QUIT") == 0) {
+      exit = 1;
+    }
+
+    //If typed something else, try again
+    else {
+      cout << "Please try again." << endl;
+    }
+  }
   
-  cin >> input; //1
-  add(root, input);
-  cin >> input; //2
-  add(root, input);
-  cin >> input; //3
-  add(root, input);
-  cin >> input; //4
-  add(root, input);
-  cin >> input; //5
-  add(root, input);
-  cin >> input; //6
-  add(root, input);
-  cin >> input; //7
-  add(root, input);
-  cin >> input; //8
-  add(root, input);
-  cin >> input; //9
-  add(root, input);
-  cin >> input; //10
-  add(root, input);
-  cin >> input; //11
-  add(root, input);
-  cin >> input; //12
-  add(root, input);
-  cin >> input; //13
-  add(root, input);
-  cin >> input; //14
-  add(root, input);
-  cin >> input; //15
-  add(root, input);
-  cin >> input; //16
-  add(root, input);
-  
-  print(root);
-  search(root, 200);
-  printTree(root, 0);
+  cout << "Largest number" << findLargest(root->left) << endl;
   return 0;
 }
 
 void add(node* &root, int value) {
   if (root == NULL) {
     root = new node(value);
-    
-    cout << "if " << root->value << endl;
   }
   else if (value < root->value) {
     add(root->left, value);
-    cout << "ekse if" << endl;
   }
   else if (value > root->value) {
     add(root->right, value);
@@ -118,7 +150,7 @@ void printTree(node* &root, int space) {
 node* search(node* &root, int value) {
   if (root != NULL) {
     if (root->value == value) {
-      cout << "Search value " << value << " found" << endl;
+      cout << "Value " << value << " found" << endl;
       return root;
     }
     else {
@@ -131,9 +163,53 @@ node* search(node* &root, int value) {
     }
   }
   else {
-    cout << "Search value " << value << " not found" << endl;
+    cout << "Value " << value << " not found" << endl;
     return NULL;
   }
   
 }
 
+//finds largest number
+int findLargest(node* &root) {
+  node* currentPtr = root;
+  while(currentPtr != NULL && currentPtr->right != NULL) {
+    currentPtr = currentPtr->right;
+  }
+  return currentPtr->value;
+}
+
+void remove(node* &root, int value) {
+  if (root->value == value) {
+    
+    //Case 0 - 0 children
+    if (root->left == NULL && root->right == NULL) {
+      root = NULL;
+      cout << "meatballs" << endl;
+    }
+    //Case 1 - 1 child 
+    else if (root->left != NULL && root->right == NULL) {
+      root = root->left;
+      cout << "pasta" << endl;
+    }
+    else if (root->left == NULL && root->right != NULL) {
+      root = root->right;
+      cout << "eggrolls" << endl;
+    }
+    //Case 2 - 2 children
+    else {
+      cout << "crackers" << endl;
+      int largestInLeftSubTree = findLargest(root->left);
+      root->value = largestInLeftSubTree;
+      remove(root->left, largestInLeftSubTree);
+      cout << "bread" << endl;
+    }
+  }
+  else {
+    if (value < root->value && root->left != NULL) {
+      remove(root->left, value);
+    }
+    else if (value > root->value && root->right != NULL) {
+      remove(root->right, value);
+    }
+  }  
+}
